@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Coding Surprise 💻🎉</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #1e1e2f;
+    font-family: 'Courier New', monospace;
+    overflow: hidden;
+  }
+
+  canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+
+  .terminal {
+    background: #0f0f14;
+    padding: 30px;
+    border-radius: 12px;
+    width: min(90vw, 500px);
+    color: #33ff33;
+    text-align: left;
+    z-index: 10;
+    box-shadow: 0 0 20px #00ff99;
+  }
+
+  .message {
+    margin-top: 20px;
+    font-size: 22px;
+    color: #fff;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 10px;
+    background: #33ff33;
+    animation: blink 1s steps(1) infinite;
+    margin-left: 2px;
+  }
+
+  @keyframes blink {
+    50% { background: transparent; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="terminal" id="terminal">
+  <div id="code">console.log("Touch the screen!");<span class="cursor"></span></div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+// Confetti particles
+let confetti = [];
+
+class Particle {
+  constructor(x, y, color) {
+    this.x = x;
+    this.y = y;
+    this.vx = (Math.random() - 0.5) * 4;
+    this.vy = Math.random() * -8 - 2;
+    this.color = color;
+    this.alpha = 1;
+    this.size = Math.random() * 6 + 4;
+    this.gravity = 0.2;
+  }
+
+  update() {
+    this.vy += this.gravity;
+    this.x += this.vx;
+    this.y += this.vy;
+    this.alpha -= 0.02;
+  }
+
+  draw() {
+    ctx.globalAlpha = this.alpha;
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+}
+
+// Animation loop
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  confetti.forEach((p, i) => {
+    p.update();
+    p.draw();
+    if (p.alpha <= 0) confetti.splice(i, 1);
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+// Generate confetti
+function launchConfetti() {
+  const colors = ["#33ff33", "#00ffff", "#ff33ff", "#ffff33", "#ff6633"];
+  for (let i = 0; i < 150; i++) {
+    const x = Math.random() * canvas.width;
+    const y = canvas.height / 2;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    confetti.push(new Particle(x, y, color));
+  }
+}
+
+// Run birthday code
+let touched = false;
+canvas.addEventListener('click', () => runBirthday());
+canvas.addEventListener('touchstart', () => runBirthday());
+
+function runBirthday() {
+  if (touched) return;
+  touched = true;
+
+  const codeEl = document.getElementById('code');
+  codeEl.textContent = 'console.log("🎉 HAPPY BIRTHDAY BIG BROTHER! 🎉");';
+  
+  launchConfetti();
+  
+  setTimeout(() => {
+    const msg = document.createElement('div');
+    msg.className = 'message';
+    msg.textContent = '🎂Happy Birthday, Big Brother! 🎉 Wishing you an amazing year ahead as you keep powering through on your journey to your goals. 🎂';
+    document.body.appendChild(msg);
+  }, 1000);
+}
+</script>
+
+</body>
+</html>
